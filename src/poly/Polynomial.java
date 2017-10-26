@@ -1,6 +1,10 @@
 package poly;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
@@ -15,6 +19,7 @@ import util.Vector;
 public class Polynomial {
 
 	private ArrayList<Term> _terms; // The Polynomial is the sum of these Terms
+
 
 	/** This constructor has been implemented for you.  It simply initializes an
 	 *  empty term list.
@@ -34,10 +39,11 @@ public class Polynomial {
 
 		if (s == null || s.trim().equals(""))
 			throw new PolyException("Empty Polynomial, cannot read");
+                
 		_terms = new ArrayList<Term>();
 		String[] terms = s.split("\\+");
 		for (String term : terms)
-			_terms.add(new Term(term));
+                    _terms.add(new Term(term));
 	}
 	
 	/** Produce a re-parseable representation of this Polynomial as a String.  This
@@ -71,10 +77,13 @@ public class Polynomial {
 	 * @return
 	 * @throws PolyException if there were any errors reading or parsing the file
 	 */
-	public static Polynomial ReadPolynomial(File file) throws PolyException {
+	public static Polynomial ReadPolynomial(File file) throws PolyException, FileNotFoundException, IOException {
+            
+            BufferedReader fin = new BufferedReader(new FileReader(file));
+            Polynomial newPoly = new Polynomial(fin.readLine());
 
 		// TODO: Should not return null!
-		return null;
+		return newPoly;
 	}
 	
 	/** Returns all of the variables used in this Polynomial as a sorted set (TreeSet).
@@ -82,24 +91,33 @@ public class Polynomial {
 	 * @return (TreeSet of Strings as defined above)
 	 */
 	public TreeSet<String> getAllVars() {
-
-		// TODO: Should not return null!
-		return null;
-	}
-	
+            
+            TreeSet<String> t = new TreeSet<String>();
+            for(Term term : _terms){
+                for(String var : term.getAllVars()){
+                     t.add(var);
+                }
+		// X TODO: Should not return null!
+            }
+            return t;
+        }
+        
 	/** If Polynomial defines f(x,y) = 2xy^2 + xy and assignments is { x=2.0 y=3.0 } 
 	 *  then this method returns 42.0, which is the evaluation of f(2.0,3.0).  
 	 *  Incidentally, this is also the "Answer to the Ultimate Question of Life, the 
 	 *  Universe, and Everything" in case you were wondering.
 	 * 
 	 * @param assignments
-	 * @return
+	 * @return eval
 	 * @throws PolyException
 	 */
 	public double evaluate(Vector assignments) throws Exception {
-
-		// TODO: Should not return 0!
-		return 0;
+            double eval = 0.0;
+            for(Term term : _terms){
+                eval += term.evaluate(assignments);
+            }
+		// X TODO: Should not return 0!
+            return eval;
 	}
 
 	/** If Polynomial defines a function f(.) then this method returns the **symbolic**
@@ -115,9 +133,15 @@ public class Polynomial {
 	 * @return partial derivative of this w.r.t. var as a new Term
 	 */
 	public Polynomial differentiate(String var) {
-
-		// TODO: Should not return null!
-		return null;
+            
+            Polynomial dPoly = new Polynomial();
+            for(Term term : _terms){
+                term = term.differentiate(var);
+                if(term.getCoef() != 0.0)
+                    dPoly._terms.add(term);
+            }
+            // X TODO: Should not return null!
+            return dPoly;
 	}
 
 	/** Some examples testing the Polynomial and Term classes with expected output.

@@ -75,8 +75,13 @@ public class Minimizer {
 	 */
 	public void minimize(Polynomial p) throws Exception {
 			
-		// TODO: Build the partial derivatives of p for all variables in p
-		
+		//Build the partial derivatives of p for all variables in p
+		_var2gradp = new HashMap <String,Polynomial>();
+                
+                for(String key : p.getAllVars()){
+                    _var2gradp.put(key, p.differentiate(key));
+                }
+                        
 		// Start the gradient descent
 		_nIter = 0;
 		long start = System.currentTimeMillis();
@@ -87,17 +92,30 @@ public class Minimizer {
 		_lastObjVal = p.evaluate(_x0);
 		
 		_lastGradNorm = Double.MAX_VALUE;
-		
-		// TODO: Main descent loop
-		//	while (iterations is less than maximum iterations allowed AND gradient norm is greater than eps) {
-		//	  increment iterations
-		//	  compute gradient and gradient norm
-		//	  compute new point by adding current point and the negation of the step size times the gradient
-		//	  evaluate the objective at the new point
-		//	  print iteration number, new point, objective at new point, i.e.
-		//      System.out.format("At iteration %d: %s objective value = %.3f\n", _nIter, _lastx, _lastObjVal);
-		//	}
-			
+	
+                //main descent loop
+		while(_nIter < _maxIter && _lastGradNorm > _eps){
+                    
+                    //increment iterations
+                    _nIter++;
+                    //compute gradient
+                    Vector g = new Vector();
+                    for(String key : _var2gradp.keySet()){                       
+                        //partial derivative of the polynomial given each key
+                        double val = _var2gradp.get(key).evaluate(_lastx);
+                        g.set(key, val);            
+                    }
+                    //compute gradient norm
+                    _lastGradNorm = g.computeL2Norm();
+                    //compute new point by adding current point and the negation of the step size times the gradient
+                    _lastx = _lastx.sum(g.scalarMult((-1)*_stepSize));
+                    //evaluate the objective at the new point
+                    _lastObjVal = p.evaluate(_lastx);
+                    //print iteration number new point, objective at new point
+                    System.out.format("At iteration %d: %s objective value = %.3f\n", _nIter, _lastx, _lastObjVal);
+                }
+                
+                
 		// Record the end time
 		_compTime = System.currentTimeMillis()-start;
 	}

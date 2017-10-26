@@ -28,6 +28,25 @@ public class Term {
 		_vars = new ArrayList<String>();
 		_pows = new ArrayList<Integer>();
 	}
+        
+        /** Copy Term into new Term
+	 * 
+	 * @param term
+	 */
+	public Term(Term term) {
+            this(term._coef); 
+            _vars = new ArrayList<String>(term._vars);
+            _pows = new ArrayList<Integer>(term._pows);
+	}
+	
+        /** Return the coefficient of the term
+         * 
+         * @return coef
+	 */
+	public double getCoef() {
+            double coef = _coef;
+            return coef;
+	}
 	
 	/** This constructor has been implemented for you -- it parses a term 
 	 *  representation from a String into the format required by this class.
@@ -75,7 +94,7 @@ public class Term {
 		}
 	}
 	
-	/** Produce a re-parseable representation of this Term as a String.  This
+  	/** Produce a re-parseable representation of this Term as a String.  This
 	 *  has been done for you.
 	 * 
 	 */
@@ -84,6 +103,7 @@ public class Term {
 		// immutable.  StringBuilder is much more efficient for append.
 		StringBuilder sb = new StringBuilder();
 		sb.append(String.format("%01.3f", _coef));
+
 		for (int i = 0; i < _vars.size(); i++) {
 			String var = _vars.get(i);
 			int pow = _pows.get(i);
@@ -107,20 +127,22 @@ public class Term {
 	///////////////////////////////////////////////////////////////////////////////
 	// TODO: Your methods here!  You should add some helper methods that facilitate
 	//       the implementation of the methods below.
-	///////////////////////////////////////////////////////////////////////////////
-
+	//////////////////////////////////////////////////////////////////////////////
+        
 	/** If Term defines a function f(x,y) = 2xy^2 and assignments is { x=2.0 y=3.0 } 
 	 *  then this method returns 36.0, which is the evaluation of f(2.0,3.0). 
 	 * 
 	 * @param assignments
-	 * @return
+	 * @return eval
 	 * @throws PolyException
 	 */
 	public double evaluate(Vector assignments) throws PolyException {
-
-		// TODO: Should not return 0!
-		return 0;
-	}
+            
+            double eval = _coef;
+            for (String var : _vars)
+                eval *= Math.pow(assignments.getVal(var), _pows.get(_vars.indexOf(var)));
+            return eval;
+        }
 
 	/** If Term defines a function f(.) then this method returns the **symbolic**
 	 *  partial derivative (which you can verify from calculus is still a Term):
@@ -132,11 +154,27 @@ public class Term {
 	 *  instead returns a **new** Term 4xy.
 	 * 
 	 * @param var
-	 * @return partial derivative of this w.r.t. var as a new Term
+	 * @return dTerm partial derivative of this w.r.t. var as a new Term
 	 */
 	public Term differentiate(String var) {
+            Term dTerm = new Term(this);
 
-		// TODO: Should not return null!
-		return null;
-	}
+            if(!_vars.contains(var)){ //if var does not already exist in Term variables
+                return new Term(0.0);
+            }
+            else if(this._pows.get(_vars.indexOf(var)) == 1){ // if var is to the first order 
+                dTerm._coef = _coef;
+                dTerm._vars.remove(_vars.indexOf(var));
+                dTerm._pows.remove(_vars.indexOf(var));
+            }
+            else if( (_coef != 0.0) && _vars.isEmpty() && _pows.isEmpty())
+                return null;
+            else{
+                //set the differentiated coefficient and powers
+                dTerm._coef = this._coef * this._pows.get(dTerm._vars.indexOf(var)); //multiply coefficent by value of var exponent
+                dTerm._pows.set(dTerm._vars.indexOf(var),_pows.get(_vars.indexOf(var))-1);
+            }
+	return dTerm;
+        }
+
 }

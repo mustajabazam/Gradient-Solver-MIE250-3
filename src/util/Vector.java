@@ -20,26 +20,37 @@ public class Vector {
 	 * 
 	 */
 	public Vector() {
-		// TODO: this method should not be empty! 
-		// Hint: is there any memory you want to allocate?
+            
+            _hmVar2Value = new HashMap<String,Double>();
+            
 	}
-
+        
 	/** Constructor that parses a String s like "{ x=-1 y=-2.0 z=3d }" into 
 	 *  the internal HashMap representation of the Vector.  See usage in main().
 	 * 
 	 * @param s
 	 */
 	public Vector(String s) {
-		// TODO: this method should not be empty! 
-		// Hint: you're going to have use String.split covered in the File I/O lecture.
+            
+            _hmVar2Value = new HashMap<String,Double>();
+            
+            String[] variables = s.split("\\s"); 
+            for(String var : variables){
+                var = var.trim();
+                String[] varVals = var.split("="); //separate the variable name from assigned value
+                if (varVals.length == 2){
+                    _hmVar2Value.put(varVals[0],Double.parseDouble(varVals[1]));
+                }
+            }
 	}
 
 	/** Removes (clears) all (key,value) pairs from the Vector representation
 	 * 
 	 */
 	public void clear() {
-		// TODO: this method should not be empty! 
-		// Hint: look very carefully at the available methods of HashMap... this is a one liner!
+            
+            _hmVar2Value.clear();
+
 	}
 
 	/** Sets a specific var to the value val in *this*, i.e., var=val
@@ -48,8 +59,20 @@ public class Vector {
 	 * @param val - value to change it to
 	 */
 	public void set(String var, double val) {
-		// TODO: this method should not be empty! 
-		// Hint: look very carefully at the available methods of HashMap... this is a one liner!
+            
+            this._hmVar2Value.put(var, val);
+
+	}
+        
+        /** Gets the val from a key in private HashMap
+	 * 
+	 * @param var 
+	 * @return val
+	 */
+	public double getVal(String var) {
+            
+            double val = _hmVar2Value.get(var); 
+            return val;	
 	}
 
 	/** Sets all entries in *this* Vector to match entries in x
@@ -58,15 +81,103 @@ public class Vector {
 	 * @param x
 	 */
 	public void setAll(Vector x) {
-		// TODO: this method should not be empty! 
-		// Hint: look very carefully at the available methods of HashMap... this is a one liner!
+            
+            _hmVar2Value.putAll(x._hmVar2Value);
+
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
 	// TODO: Add your methods here!  You'll need more than those above to make
 	//       main() work below.
 	///////////////////////////////////////////////////////////////////////////////
-	
+        
+        /** Produce a representation of this Vector as a String. 
+	 * 
+         * @return String
+	 */
+        public String toString(){
+            StringBuilder sb = new StringBuilder();
+            sb.append("{ ");
+            for(String key : _hmVar2Value.keySet()) // add each vector variable and value
+                sb.append(String.format("%s=%6.4f ", key, _hmVar2Value.get(key)));
+            sb.append("}");
+            return sb.toString();
+        }
+        
+        /*Returns a new Vector after adding Vector vec to this
+        *
+        *@param vec
+        *@return vecSum
+        */
+        public Vector sum(Vector vec){
+            
+            Vector vecSum = new Vector();
+            double val = 0.0;
+            
+            for(String key : this._hmVar2Value.keySet()){
+                val = this._hmVar2Value.get(key) + vec._hmVar2Value.get(key);            
+                vecSum.set(key, val);
+            }
+            return vecSum;
+        }
+        
+        /*Returns a new Vector after multiplying original with double scalar
+        *
+        *@param scalar
+        *@return scaMult
+        */
+        public Vector scalarMult(double scalar){
+            
+            Vector vecMult = new Vector();
+            double val = 0.0;
+            
+            for(String key : this._hmVar2Value.keySet()){
+                val = this._hmVar2Value.get(key)*scalar ; //multiply each value in vector to a scalar
+                vecMult.set(key, val);
+            }
+            return vecMult;
+        }
+        
+        /*Returns a new Vector after multiplying original with double scalar
+        *
+        *@param scalar
+        *@return scaMult
+        */
+        public double computeL2Norm(){
+            
+            double lengthSq = 0.0;
+            
+            for(String key : this._hmVar2Value.keySet()){
+                lengthSq += this._hmVar2Value.get(key) * this._hmVar2Value.get(key);
+            }
+            return Math.sqrt(lengthSq);
+        }
+        
+        /*Test whether another Object o (should be Vector) is equal to *this*
+        * i.e same vector points and each key and val correspond
+        *
+        *@param o
+        *@return true or false
+        */
+        @Override
+        public boolean equals(Object o){
+            if (o instanceof Vector){
+                Vector v = (Vector) o; //cast object to Vector since it is a subtype
+                
+                if(this._hmVar2Value.size() != v._hmVar2Value.size())
+                    return false; // Vectors not equal if dont have same dimension
+                
+                for(String key : this._hmVar2Value.keySet()){
+                    if(!(this._hmVar2Value.get(key).equals(v._hmVar2Value.get(key))))
+                        return false;
+                }
+                return true; // all values are same
+            }
+            else{
+                return false; // object not a Vector class type
+            }
+        }
+        
 	/** Your Vector class should implement the core functionality below and produce
 	 *  **all** of the expected outputs below.  **These will be tested for grading.**
 	 * 
@@ -117,5 +228,5 @@ public class Vector {
 		System.out.println(vec3.equals(vec3)); // Should print: true
 		System.out.println(vec3.equals(vec4)); // Should print: true
 		System.out.println(vec1.sum(vec2).equals(vec2.sum(vec1))); // Should print: true
-	}	
+}	
 }

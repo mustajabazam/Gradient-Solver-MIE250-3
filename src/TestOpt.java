@@ -20,6 +20,24 @@ public class TestOpt {
 		// You must run more test cases than this!
 		RunMinimizer("files/poly1.txt", 0.001, 200, 0.10, "{ x=1.0 }");
 		RunMinimizer("files/poly2.txt", 0.001, 200, 0.10, "{ x=1.0 y=1.0 }");
+                
+                
+                System.out.println("*****MY TEST CASES*****");
+                
+                Vector test1 = new Vector ("{ x=2.000 y=-9 z=8 }");
+                Vector test2 = new Vector ("{ x=1.000 y=2 z=-10 }");
+                System.out.println("ANS:{ x=3.0000 y=-7.0000 z=-2.0000 }: " + test1.sum(test2));     
+                System.out.println("ANS: 10.246950765959598 "+ test2.computeL2Norm());
+                
+                Polynomial testp  = new Polynomial("x^6 + y^8 + -8*x^7*y + 8");
+		Polynomial testp2 = new Polynomial(testp.toString());
+                
+		Polynomial dtestp = testp.differentiate("x");
+		Polynomial dtestp2 = testp.differentiate("y");
+                
+                System.out.println(dtestp);
+                System.out.println(dtestp2);          
+                
 	}	
 
 	public static void RunMinimizer(String polyfile, double eps, int max_iter, double alpha, String sx0) 
