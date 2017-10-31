@@ -24,6 +24,9 @@ public class TestOpt {
                 
                 System.out.println("*****MY TEST CASES*****");
                 
+		Term tm1 = new Term ("x^2*y^4*z");
+		System.out.println("ANS:1.000x^2*y^4*z" + tm1);
+		
                 Vector test1 = new Vector ("{ x=2.000 y=-9 z=8 }");
                 Vector test2 = new Vector ("{ x=1.000 y=2 z=-10 }");
                 System.out.println("ANS:{ x=3.0000 y=-7.0000 z=-2.0000 }: " + test1.sum(test2));     
